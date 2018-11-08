@@ -6,6 +6,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 
+import java.io.File;
+
 /**
  * Base script functionality, can be used for all Selenium scripts.
  */
@@ -17,14 +19,14 @@ public abstract class BaseScript {
      */
     protected static WebDriver getDriver() {
         // Do not forget uncomment it for Windows
-        // System.setProperty("webdriver.chrome.driver", System.clearProperty("user.dir") + "//resources//chromedriver.exe ");
+        // System.setProperty("webdriver.chrome.driver", new File(BaseScript.class.getResource("/chromedriver.exe").getFile()).getPath());
         return new ChromeDriver();
     }
 
     /**
      * Authenticate the test user to the admin tool
      */
-    protected static void authenticate(WebDriver driver) throws InterruptedException {
+    protected static void authenticate(WebDriver driver) {
         driver.get(Properties.getBaseAdminUrl());
         // Type the email as a login
         WebElement loginInput = driver.findElement(By.id("email"));
@@ -36,7 +38,15 @@ public abstract class BaseScript {
         WebElement submitButton = driver.findElement(By.name("submitLogin"));
         submitButton.click();
         // Wait enough for an authentication step
-        Thread.sleep(5000);
+        timeout(5000);
+    }
+
+    protected static void timeout(int millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 }

@@ -7,43 +7,51 @@ import org.openqa.selenium.WebElement;
 
 public class CheckMainMenuTest extends BaseScript {
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
         WebDriver driver = getDriver();
 
         authenticate(driver);
 
-        testSubmenu(driver, By.id("tab-AdminDashboard"));
-        testSubmenu(driver, By.id("subtab-AdminParentOrders"));
-        testSubmenu(driver, By.id("subtab-AdminCatalog"));
-        // Id is not stable for "Клиенты" tab
-        testSubmenu(driver, By.cssSelector("[data-submenu=\"23\"]"));
-        testSubmenu(driver, By.id("subtab-AdminParentCustomerThreads"));
-        testSubmenu(driver, By.id("subtab-AdminStats"));
-        testSubmenu(driver, By.id("subtab-AdminParentModulesSf"));
-        // Id is not stable for "Design" tab
-        testSubmenu(driver, By.cssSelector("[data-submenu=\"46\"]"));
-        testSubmenu(driver, By.id("subtab-AdminParentShipping"));
-        testSubmenu(driver, By.id("subtab-AdminParentPayment"));
-        testSubmenu(driver, By.id("subtab-AdminInternational"));
-        testSubmenu(driver, By.id("subtab-ShopParameters"));
-        testSubmenu(driver, By.id("subtab-AdminAdvancedParameters"));
-        testSubmenu(driver, By.className("menu-collapse"));
+        By[] locators = {
+                By.id("tab-AdminDashboard"),
+                By.id("subtab-AdminParentOrders"),
+                // Id is not stable for "Каталог" tab
+                By.cssSelector("[data-submenu=\"9\"]"),
+                // Id is not stable for "Клиенты" tab
+                By.cssSelector("[data-submenu=\"23\"]"),
+                By.id("subtab-AdminParentCustomerThreads"),
+                By.id("subtab-AdminStats"),
+                By.cssSelector("[data-submenu=\"42\"]"),
+                // Id is not stable for "Design" tab
+                By.cssSelector("[data-submenu=\"46\"]"),
+                By.id("subtab-AdminParentShipping"),
+                By.id("subtab-AdminParentPayment"),
+                By.id("subtab-AdminInternational"),
+                By.id("subtab-ShopParameters"),
+                By.id("subtab-AdminAdvancedParameters"),
+                By.className("menu-collapse")
+        };
+
+        for (By locator : locators) {
+            testSubmenu(driver, locator);
+        }
 
         driver.quit();
     }
 
-    private static void testSubmenu(WebDriver driver, By locator) throws InterruptedException {
+    private static void testSubmenu(WebDriver driver, By locator) {
         WebElement tab = driver.findElement(locator);
+        // Save a submenu title before refresh
+        String submenuTitle = tab.getText();
         // Print a submenu title
-        System.out.println(tab.getText());
+        System.out.print(submenuTitle);
         tab.click();
 
-        // Save URL before refresh
-        String urlBeforeRefresh = driver.getCurrentUrl();
         driver.navigate().refresh();
         // Wait for refresh
-        Thread.sleep(3000);
-        // Check that URL after does not change
-        System.out.print(" " + driver.getCurrentUrl().equals(urlBeforeRefresh));
+        timeout(2000);
+        tab = driver.findElement(locator);
+        // Check that the page title start from the submenu title
+        System.out.println(" " + tab.getText().equals(submenuTitle));
     }
 }
